@@ -20,6 +20,13 @@
  */
 
 
+#include <Wire.h>
+#include <Adafruit_MotorShield.h>
+#include "utility/Adafruit_PWMServoDriver.h"
+
+Adafruit_MotorShield AFMS = Adafruit_MotorShield();
+Adafruit_DCMotor *myMotor1 = AFMS.getMotor(1);
+Adafruit_DCMotor *myMotor2 = AFMS.getMotor(2);
 
 // These constants won't change.  They're used to give names
 // to the pins used:
@@ -31,22 +38,21 @@ int outputValue = 0;        // value output to the PWM (analog out)
 void setup() {
   // initialize serial communications at 9600 bps:
   Serial.begin(9600);
+  AFMS.begin();
+  myMotor1->setSpeed(100);
+  myMotor1->run(FORWARD);
+  myMotor2->setSpeed(100);
+  myMotor2->run(FORWARD);
 }
 
 void loop() {
-  // read the analog in value:
   sensorValue = analogRead(analogInPin);
-  // map it to the range of the analog out:
   outputValue = map(sensorValue, 0, 1023, 0, 5000);
 
-  // print the results to the serial monitor:
   Serial.print("sensor = " );
   Serial.print(sensorValue);
   Serial.print("\t output = ");
   Serial.println(outputValue);
 
-  // wait 500 milliseconds before the next loop
-  // for the analog-to-digital converter to settle
-  // after the last reading:
   delay(100);
 }
