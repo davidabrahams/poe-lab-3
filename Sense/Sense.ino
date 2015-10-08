@@ -8,8 +8,8 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *myMotorL = AFMS.getMotor(1);
 Adafruit_DCMotor *myMotorR = AFMS.getMotor(2);
 
-byte baseSpeed = 50;
-byte correction = 40;
+byte baseSpeed = 20;
+byte correction = 8;
 
 byte motorSpeedL;
 byte motorSpeedR;
@@ -37,16 +37,16 @@ void setup() {
   myMotorR->run(FORWARD);
 }
 
-void update_speeds(sensorL, sensorR)
+void update_speeds(int sensorL, int sensorR)
 {
 
-  coercedL = min(max(sensorL, threshold), overLine);
-  coercedR = min(max(sensorR, threshold), overLine);
+  int coercedL = min(max(sensorL, threshold), overLine);
+  int coercedR = min(max(sensorR, threshold), overLine);
 
-  diffRange = overLine - threshold;
+  int diffRange = overLine - threshold;
 
-  diff = coercedR - coercedL;
-  speedCorrection = map(diff, -diffRange, diffRange, -correction, correction);
+  int diff = coercedR - coercedL;
+  int speedCorrection = map(diff, -diffRange, diffRange, -correction, correction);
 
   // If sensorR is greater, the right sensor is over the tape. The left motor
   // must go faster.
@@ -57,14 +57,19 @@ void update_speeds(sensorL, sensorR)
 
 void loop()
 {
-  sensorValue1 = analogRead(analogInPin1);
-  sensorValue2 = analogRead(analogInPin2);
-  outputValue1 = map(sensorValue1, 0, 1023, 0, 5000);
-  outputValue2 = map(sensorValue2, 0, 1023, 0, 5000);
+  int sensorValue1 = analogRead(analogInPin1);
+  int sensorValue2 = analogRead(analogInPin2);
+  int outputValue1 = map(sensorValue1, 0, 1023, 0, 5000);
+  int outputValue2 = map(sensorValue2, 0, 1023, 0, 5000);
 
   update_speeds(outputValue1, outputValue2);
   myMotorL->setSpeed(motorSpeedL);
   myMotorR->setSpeed(motorSpeedR);
+
+  Serial.print("Left: ");
+  Serial.print(motorSpeedL);
+  Serial.print("Right: ");
+  Serial.println(motorSpeedR);
 
   delay(100);
 }
