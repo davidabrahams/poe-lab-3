@@ -5,11 +5,12 @@
 #include "utility/Adafruit_PWMServoDriver.h"
 
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
-Adafruit_DCMotor *myMotorL = AFMS.getMotor(1);
-Adafruit_DCMotor *myMotorR = AFMS.getMotor(2);
+Adafruit_DCMotor *myMotorL = AFMS.getMotor(3);
+Adafruit_DCMotor *myMotorR = AFMS.getMotor(4);
 
-byte baseSpeed = 20;
-byte correction = 8;
+int baseSpeed = 30;
+int correction = 5;
+int breakValue = 25;
 
 byte motorSpeedL;
 byte motorSpeedR;
@@ -17,13 +18,13 @@ byte motorSpeedR;
 int threshold = 2700;
 int overLine = 3800;
 
+int sensorValueL;
+int sensorValueR;
+
 // These constants won't change.  They're used to give names
 // to the pins used:
 const int analogInPin1 = A0;  // Analog input pin that the potentiometer is attached to
-const int analogInPin2 = A1;  // Analog input pin that the potentiometer is attached to
-
-int sensorValue = 0;        // value read from the pot
-int outputValue = 0;        // value output to the PWM (analog out)
+const int analogInPin2 = A1;  // Analog input pin that the
 
 void setup() {
   // initialize serial communications at 9600 bps:
@@ -46,23 +47,26 @@ void update_speeds(int sensorL, int sensorR)
   int diffRange = overLine - threshold;
 
   int diff = coercedR - coercedL;
-  int speedCorrection = map(diff, -diffRange, diffRange, -correction, correction);
+  int speedCorrection = map(diff, -diffRange, diffRange, -correction,
+                            correction);
 
   // If sensorR is greater, the right sensor is over the tape. The left motor
   // must go faster.
-  motorSpeedL = baseSpeed + speedCorrection / 2;
-  motorSpeedR = baseSpeed - speedCorrection / 2;
+  int adjBase = baseSpeed - breakValue * abs(speedCorrection) / correction;
+
+  motorSpeedL = adjBase + speedCorrection;
+  motorSpeedR = adjBase - speedCorrection;
 
 }
 
 void loop()
 {
-  int sensorValue1 = analogRead(analogInPin1);
-  int sensorValue2 = analogRead(analogInPin2);
-  int outputValue1 = map(sensorValue1, 0, 1023, 0, 5000);
-  int outputValue2 = map(sensorValue2, 0, 1023, 0, 5000);
+  sensorValueL = analogRead(analogInPin1);
+  sensorValueR = analogRead(analogInPin2);
+  int outputValueL = map(sensorValueL, 0, 1023, 0, 5000);
+  int outputValueR = map(sensorValueR, 0, 1023, 0, 5000);
 
-  update_speeds(outputValue1, outputValue2);
+  update_speeds(outputValueL, outputValueR);
   myMotorL->setSpeed(motorSpeedL);
   myMotorR->setSpeed(motorSpeedR);
 
