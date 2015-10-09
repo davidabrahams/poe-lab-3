@@ -21,6 +21,10 @@ int overLine = 3800;
 int sensorValueL;
 int sensorValueR;
 
+// variable to store the current time
+unsigned long currTime;
+byte sleepTime = 25; // ms
+
 // These constants won't change.  They're used to give names
 // to the pins used:
 const int analogInPin1 = A0;  // Analog input pin that the potentiometer is attached to
@@ -61,6 +65,8 @@ void update_speeds(int sensorL, int sensorR)
 
 void loop()
 {
+  currTime = millis();
+  
   sensorValueL = analogRead(analogInPin1);
   sensorValueR = analogRead(analogInPin2);
   int outputValueL = map(sensorValueL, 0, 1023, 0, 5000);
@@ -69,11 +75,11 @@ void loop()
   update_speeds(outputValueL, outputValueR);
   myMotorL->setSpeed(motorSpeedL);
   myMotorR->setSpeed(motorSpeedR);
+  
+//  Serial.print("Left: ");
+//  Serial.print(motorSpeedL);
+//  Serial.print("Right: ");
+//  Serial.println(motorSpeedR);
 
-  Serial.print("Left: ");
-  Serial.print(motorSpeedL);
-  Serial.print("Right: ");
-  Serial.println(motorSpeedR);
-
-  delay(100);
+  delay(sleepTime - (millis() - currTime()));
 }
