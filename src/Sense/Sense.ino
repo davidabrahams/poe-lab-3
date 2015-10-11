@@ -22,8 +22,8 @@ int sensorValueL;
 int sensorValueR;
 
 // variable to store the current time
-unsigned long currTime;
-long sleepTime = 25; // ms
+long currTime;
+byte sleepTime = 25; // ms
 
 // These constants won't change.  They're used to give names
 // to the pins used:
@@ -91,15 +91,21 @@ void readSerial()
 
 void loop()
 {
+  
   readSerial();
 
   sensorValueL = analogRead(analogInPin1);
   sensorValueR = analogRead(analogInPin2);
   int outputValueL = map(sensorValueL, 0, 1023, 0, 5000);
   int outputValueR = map(sensorValueR, 0, 1023, 0, 5000);
+  Serial.print(String(outputValueL) + ",");
+  Serial.print(String(outputValueR) + ",");
 
   update_speeds(outputValueL, outputValueR);
   myMotorL->setSpeed(motorSpeedL);
   myMotorR->setSpeed(motorSpeedR);
+  Serial.print(String(motorSpeedL) + ",");
+  Serial.print(String(motorSpeedR) + ",");
+  Serial.println(millis());
   delay(sleepTime);
 }
