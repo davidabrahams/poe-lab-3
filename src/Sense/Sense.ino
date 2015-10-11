@@ -8,9 +8,9 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *myMotorL = AFMS.getMotor(3);
 Adafruit_DCMotor *myMotorR = AFMS.getMotor(4);
 
-int baseSpeed = 30;
-int correction = 5;
-int breakValue = 25;
+int baseSpeed;
+int correction;
+int breakValue;
 
 byte motorSpeedL;
 byte motorSpeedR;
@@ -34,6 +34,10 @@ void setup() {
   // initialize serial communications at 9600 bps:
   Serial.begin(9600);
   AFMS.begin();
+  // initial values
+  baseSpeed = 30;
+  correction = 5;
+  breakValue = 25;
   motorSpeedL = baseSpeed;
   motorSpeedR = baseSpeed;
   myMotorL->setSpeed(motorSpeedL);
@@ -63,10 +67,34 @@ void update_speeds(int sensorL, int sensorR)
 
 }
 
+void readSerial()
+{
+  if (Serial.available() > 0)
+  {
+    String firstCharacter = String(char(Serial.read()));
+    int readInt = Serial.parseInt();
+    Serial.println(firstCharacter);
+    Serial.println(readInt);
+
+    if (firstCharacter.equalsIgnoreCase("S"))
+    {
+      baseSpeed = readInt;
+    } else if (firstCharacter.equalsIgnoreCase("B"))
+    {
+      breakValue = readInt;
+    } else if (firstCharacter.equalsIgnoreCase("C"))
+    {
+      correction = readInt;
+    }
+  }
+}
+
 void loop()
 {
   currTime = millis();
-  
+
+  readSerial();
+
   sensorValueL = analogRead(analogInPin1);
   sensorValueR = analogRead(analogInPin2);
   int outputValueL = map(sensorValueL, 0, 1023, 0, 5000);
@@ -75,11 +103,11 @@ void loop()
   update_speeds(outputValueL, outputValueR);
   myMotorL->setSpeed(motorSpeedL);
   myMotorR->setSpeed(motorSpeedR);
-  
+
 //  Serial.print("Left: ");
 //  Serial.print(motorSpeedL);
 //  Serial.print("Right: ");
 //  Serial.println(motorSpeedR);
 
-  delay(sleepTime - (millis() - currTime()));
+  delay(sleepTime - (millis() - currTime));
 }
