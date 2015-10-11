@@ -23,7 +23,7 @@ int sensorValueR;
 
 // variable to store the current time
 long currTime;
-byte sleepTime = 25; // ms
+byte sleepTime = 0; // ms
 
 // These constants won't change.  They're used to give names
 // to the pins used:
@@ -35,9 +35,9 @@ void setup() {
   Serial.begin(9600);
   AFMS.begin();
   // initial values
-  baseSpeed = 30;
-  correction = 5;
-  breakValue = 25;
+  baseSpeed = 50;
+  correction =16;
+  breakValue = 30;
   motorSpeedL = baseSpeed;
   motorSpeedR = baseSpeed;
   myMotorL->setSpeed(motorSpeedL);
